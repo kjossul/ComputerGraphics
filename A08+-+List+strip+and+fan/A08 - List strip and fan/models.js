@@ -1,5 +1,5 @@
 function buildGeometry() {
-    // Draws a cube (replace the vertices). Each row is a face
+    // Draws a cube (replace the vertices).
     let cube = [
         [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, 0.0],
         [0.0, 0.0, 1.0], [1.0, 0.0, 1.0], [0.0, 1.0, 1.0], [1.0, 1.0, 1.0]
