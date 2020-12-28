@@ -93,33 +93,33 @@ function buildGeometry() {
     // Draws a Cone -- To do for the assignment.
     ///// Creates vertices  (see A09)
     const n_y = Math.sin(utils.degToRad(30));
-    const SIDE_FACES = 72;
-    const INCR = 360.0 / SIDE_FACES;
+    let FACES = 72;
+    let INCR = 360.0 / FACES;
     let vert4 = [];
     let norm4 = [];
     let dup = [];
-    for (i = 0; i < SIDE_FACES; i++) {
+    for (i = 0; i < FACES; i++) {
         vert4.push([0.0, 1.0, 0.0]);
         let v1 = [Math.sin(i * INCR / 180.0 * Math.PI), -1.0, Math.cos(i * INCR / 180.0 * Math.PI)];
-        let v2 = [Math.sin((i + 1) % SIDE_FACES * INCR / 180.0 * Math.PI), -1.0, Math.cos((i + 1) % SIDE_FACES * INCR / 180.0 * Math.PI)];
+        let v2 = [Math.sin((i + 1) % FACES * INCR / 180.0 * Math.PI), -1.0, Math.cos((i + 1) % FACES * INCR / 180.0 * Math.PI)];
         vert4.push(v1, v2);
         dup.push(v1);
         norm4 = norm4.concat(Array(3).fill([Math.sin(i * INCR / 180.0 * Math.PI), n_y, Math.cos(i * INCR / 180.0 * Math.PI)]));
     }
     vert4.push([0.0, -1.0, 0.0]);
     vert4 = vert4.concat(dup);  // each point in the base must be inserted again
-    norm4 = norm4.concat(Array(SIDE_FACES + 1).fill([0.0, -1.0, 0.0]));
+    norm4 = norm4.concat(Array(FACES + 1).fill([0.0, -1.0, 0.0]));
     ////// Creates indices
     let ind4 = [];
     //////// side
-    for (i = 0; i < SIDE_FACES; i++) {
+    for (i = 0; i < FACES; i++) {
         let j = i * 3;
         ind4.push(j + 1, j, j + 2);
     }
     ////// Lower part
-    let k = SIDE_FACES * 3;
-    for (i = 0; i < SIDE_FACES; i++) {
-        ind4.push(k, k + i + 1, k + (i + 1) % SIDE_FACES + 1);
+    let k = FACES * 3;
+    for (i = 0; i < FACES; i++) {
+        ind4.push(k, k + i + 1, k + (i + 1) % FACES + 1);
     }
     var color4 = [1.0, 1.0, 0.0];
     addMesh(vert4, norm4, ind4, color4);
@@ -173,10 +173,41 @@ function buildGeometry() {
     var color5 = [0.8, 0.8, 1.0];
     addMesh(vert5, norm5, ind5, color5);
 
-    // Draws a Torus -- To do for the assignment.
-    var vert6 = [[-1.0, -1.0, 0.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0], [-1.0, 1.0, 0.0]];
-    var norm6 = [[0.0, 0.0, 1.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0]];
-    var ind6 = [0, 1, 2, 0, 2, 3];
+    // Draws a Torus -- To do for the assignment
+    // inner radius = 1, outer = 3
+    // each vertex has 4 possible norms
+    FACES = 36;
+    INCR = 360.0 / FACES;
+    const ALPHA = utils.degToRad(INCR);
+    let vert6 = [];
+    let norm6 = [];
+    ///// Creates vertices
+    for (j = 0; j < FACES; j++) {  // vertical step
+        let r = 2 + Math.sin(j * ALPHA);
+        let y = Math.cos(j * ALPHA);
+        for (i = 0; i < FACES; i++) {  // step of each circle
+            let x = r * Math.cos(i * ALPHA);
+            let z = r * Math.sin(i * ALPHA);
+            vert6 = vert6.concat(Array(4).fill([x, y, z]));
+            norm6.push([Math.cos(i * ALPHA - ALPHA / 2) * Math.sin(j * ALPHA - ALPHA / 2), Math.cos(j * ALPHA - ALPHA / 2), Math.sin(i * ALPHA - ALPHA / 2) * Math.sin(j * ALPHA - ALPHA / 2)]);
+            norm6.push([Math.cos(i * ALPHA + ALPHA / 2) * Math.sin(j * ALPHA - ALPHA / 2), Math.cos(j * ALPHA - ALPHA / 2), Math.sin(i * ALPHA + ALPHA / 2) * Math.sin(j * ALPHA - ALPHA / 2)]);
+            norm6.push([Math.cos(i * ALPHA - ALPHA / 2) * Math.sin(j * ALPHA + ALPHA / 2), Math.cos(j * ALPHA + ALPHA / 2), Math.sin(i * ALPHA - ALPHA / 2) * Math.sin(j * ALPHA + ALPHA / 2)]);
+            norm6.push([Math.cos(i * ALPHA + ALPHA / 2) * Math.sin(j * ALPHA + ALPHA / 2), Math.cos(j * ALPHA + ALPHA / 2), Math.sin(i * ALPHA + ALPHA / 2) * Math.sin(j * ALPHA + ALPHA / 2)]);
+        }
+    }
+    let ind6 = [];
+    for (let j = 0; j < FACES; j++) {  // vertical step
+        for (let i = 0; i < FACES; i++) {  // step of each circle
+            const a = i + FACES * j;
+            const b = (i + 1) % FACES + FACES * j;
+            const c = i + FACES * ((j + 1) % FACES);
+            const d = (i + 1) % FACES + FACES * ((j + 1) % FACES);
+            for (let n = 0; n < 4; n++) {
+                ind6.push(a * 4 + n, b * 4 + n, c * 4 + n);
+                ind6.push(c * 4 + n, b * 4 + n, d * 4 + n);
+            }
+        }
+    }
     var color6 = [1.0, 0.0, 0.0];
     addMesh(vert6, norm6, ind6, color6);
 }
