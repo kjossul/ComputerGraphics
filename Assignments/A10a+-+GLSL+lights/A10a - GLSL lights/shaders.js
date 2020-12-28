@@ -77,8 +77,8 @@ var S4 = `
 // Single spot light (with decay) [slide 28]
 var S5 = `
 	lightDirA = normalize(LAPos - fs_pos);
-	float cOut = cos(LAConeOut / 2.0);
-	float cIn = cos(LAConeIn / 2.0);
+	float cOut = cos(radians(LAConeOut) / 2.0);
+	float cIn = cos(radians(LAConeOut * LAConeIn) / 2.0);
 	float dimming = clamp((dot(lightDirA, LADir) - cOut) / (cIn - cOut), 0.0, 1.0);
 	lightColorA = LAlightColor * pow(LATarget / length(LAPos - fs_pos), LADecay) * dimming;
 `;
@@ -99,8 +99,8 @@ var S7 = `
 	lightDirB = normalize(LBPos - fs_pos);
 	lightColorB = LBlightColor;
 	lightDirC = normalize(LCPos - fs_pos);
-	float cOut = cos(LCConeOut / 2.0);
-	float cIn = cos(LCConeIn / 2.0);
+	float cOut = cos(radians(LCConeOut) / 2.0);
+	float cIn = cos(radians(LCConeOut * LCConeIn) / 2.0);
 	float dimming = clamp((dot(lightDirC, LCDir) - cOut) / (cIn - cOut), 0.0, 1.0);
 	lightColorC = LClightColor * pow(LCTarget / length(LCPos - fs_pos), LCDecay) * dimming;
 `;
