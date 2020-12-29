@@ -128,13 +128,14 @@ function buildGeometry() {
     // Draws a Sphere --- Already done, just for inspiration
     var vert5 = [[0.0, 1.0, 0.0]];
     var norm5 = [[0.0, 1.0, 0.0]];
+    const R = 5;
     ///// Creates vertices
     k = 1;
-    for (j = 1; j < 18; j++) {
+    for (j = 0; j < 18; j++) {
         for (i = 0; i < 36; i++) {
-            x = Math.sin(i * 10.0 / 180.0 * Math.PI) * Math.sin(j * 10.0 / 180.0 * Math.PI);
-            y = Math.cos(j * 10.0 / 180.0 * Math.PI);
-            z = Math.cos(i * 10.0 / 180.0 * Math.PI) * Math.sin(j * 10.0 / 180.0 * Math.PI);
+            x = R * Math.sin(i * 10.0 / 180.0 * Math.PI) * Math.sin(j * 10.0 / 180.0 * Math.PI);
+            y = R * Math.cos(j * 10.0 / 180.0 * Math.PI);
+            z = R * Math.cos(i * 10.0 / 180.0 * Math.PI) * Math.sin(j * 10.0 / 180.0 * Math.PI);
             norm5[k] = [x, y, z];
             vert5[k++] = [x, y, z];
         }
@@ -175,35 +176,24 @@ function buildGeometry() {
 
     // Draws a Torus -- To do for the assignment
     // inner radius = 1, outer = 3
-    // each vertex has 6 possible norms
-    FACES = 50;
+    FACES = 36;
     INCR = 360.0 / FACES;
     const ALPHA = utils.degToRad(INCR);
     let vert6 = [];
     let norm6 = [];
     ///// Creates vertices
     for (j = 0; j < FACES; j++) {  // vertical step
-        let r = 2 + Math.sin(j * ALPHA);
-        let y = Math.cos(j * ALPHA);
-        let cos_a1 = Math.cos(j * ALPHA - ALPHA / 2);
-        let cos_a2 = Math.cos(j * ALPHA + ALPHA / 2);
-        let sin_a1 = Math.sin(j * ALPHA - ALPHA / 2);
-        let sin_a2 = Math.sin(j * ALPHA + ALPHA / 2);
+        let cos_y = Math.cos(j * ALPHA);
+        let sin_y = Math.sin(j * ALPHA);
+        let r = 2 + sin_y;
+        let y = cos_y;
         for (i = 0; i < FACES; i++) {  // step of each circle
-            let x = r * Math.cos(i * ALPHA);
-            let z = r * Math.sin(i * ALPHA);
-            vert6 = vert6.concat(Array(6).fill([x, y, z]));
-
-            const cos_b1 = Math.cos(i * ALPHA - ALPHA / 2);
-            const cos_b2 = Math.cos(i * ALPHA + ALPHA / 2);
-            const sin_b1 = Math.sin(i * ALPHA - ALPHA / 2);
-            const sin_b2 = Math.sin(i * ALPHA + ALPHA / 2);
-            norm6.push([cos_b2 * sin_a2, cos_a2, sin_b2 * sin_a2]);
-            norm6.push([cos_b2 * sin_a2, cos_a2, sin_b2 * sin_a2]);
-            norm6.push([cos_b2 * sin_a1, cos_a1, sin_b2 * sin_a1]);
-            norm6.push([cos_b1 * sin_a1, cos_a1, sin_b1 * sin_a1]);
-            norm6.push([cos_b1 * sin_a1, cos_a1, sin_b1 * sin_a1]);
-            norm6.push([cos_b1 * sin_a2, cos_a2, sin_b1 * sin_a2]);
+            const cos_xz = Math.cos(i * ALPHA);
+            const sin_xz = Math.sin(i * ALPHA);
+            let x = r * cos_xz;
+            let z = r * sin_xz;
+            vert6.push([x, y, z]);
+            norm6.push([cos_xz * sin_y, cos_y, sin_xz * sin_y]);
         }
     }
     let ind6 = [];
@@ -213,8 +203,8 @@ function buildGeometry() {
             const b = (i + 1) % FACES + FACES * j;
             const c = i + FACES * ((j + 1) % FACES);
             const d = (i + 1) % FACES + FACES * ((j + 1) % FACES);
-            ind6.push(a * 6 + 1, b * 6 + 5, d * 6 + 3);
-            ind6.push(a * 6, d * 6 + 4, c * 6 + 2);
+            ind6.push(a, b, d);
+            ind6.push(a, d, c);
         }
     }
     var color6 = [1.0, 0.0, 0.0];
