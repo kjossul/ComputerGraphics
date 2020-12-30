@@ -1,23 +1,12 @@
 #version 300 es
-#define POSITION_LOCATION 0
-#define NORMAL_LOCATION 1
-#define UV_LOCATION 2
 
-layout(location = POSITION_LOCATION) in vec3 in_pos;
-layout(location = NORMAL_LOCATION) in vec3 in_norm;
-layout(location = UV_LOCATION) in vec2 in_uv;
+in vec3 inPosition;
+in vec3 inNormal;
+out vec3 fsNormal;
 
-uniform mat4 pMatrix;
-uniform mat4 wMatrix;
-
-out vec3 fs_pos;
-out vec3 fs_norm;
-out vec2 fs_uv;
+uniform mat4 matrix;
 
 void main() {
-  fs_pos = (wMatrix * vec4(in_pos, 1.0)).xyz;
-  fs_norm = (wMatrix * vec4(in_norm, 0.0)).xyz;
-  fs_uv = vec2(in_uv.x, 1.0-in_uv.y);
-
-  gl_Position = pMatrix * vec4(in_pos, 1.0);
+  fsNormal =  inNormal;
+  gl_Position = matrix * vec4(inPosition, 1.0);
 }
