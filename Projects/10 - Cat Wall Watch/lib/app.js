@@ -1,5 +1,7 @@
 const BASE_DIR = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
+const EYE_ANGLE = 30.0;
 
+let date = null;
 let canw, canh;
 
 let directionalLight = null,
@@ -82,6 +84,9 @@ function main() {
 }
 
 function makeSceneGraph(programs) {
+    date = new Date();
+    let p = (1000 - date.getMilliseconds()) / 1000;
+    console.log(p);
     // SCENE GRAPH
     objects["body"] = new Node();
     objects["body"].localMatrix = utils.MakeWorld(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
@@ -92,7 +97,7 @@ function makeSceneGraph(programs) {
         color: [1.0, 1.0, 1.0],
     };
     objects["eye1"] = new Node();
-    objects["eye1"].localMatrix = eye1LocalMatrix;
+    objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(EYE_ANGLE / 2 * p));
     objects["eye1"].drawInfo = {
         program: programs["eye"],
         mesh: catEye,
@@ -100,7 +105,7 @@ function makeSceneGraph(programs) {
         color: [1.0, 1.0, 1.0],
     };
     objects["eye2"] = new Node();
-    objects["eye2"].localMatrix = eye2LocalMatrix;
+    objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(EYE_ANGLE / 2 * p));
     objects["eye2"].drawInfo = {
         program: programs["eye"],
         mesh: catEye,
@@ -136,20 +141,30 @@ function makeSceneGraph(programs) {
     objects["hand1"].setParent(objects["body"]);
     objects["hand2"].setParent(objects["body"]);
     objects["tail"].setParent(objects["body"]);
-    objects["body"].updateWorldMatrix();
 }
 
 function animate() {
-    // TODO
+    let now = new Date();
+    const alpha = 2 * Math.PI * now.getMilliseconds() / 1000.0;
+    const beta = 360 * now.getMinutes() / 60;
+    const gamma = 360 * now.getHours() / 12;
+    let step = Math.cos(alpha);
+    objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
+    objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
+    objects["hand1"].localMatrix = utils.multiplyMatrices(clockHand1LocalMatrix, utils.MakeRotateZMatrix(beta));
+    objects["hand2"].localMatrix = utils.multiplyMatrices(clockHand1LocalMatrix, utils.MakeRotateZMatrix(gamma));
+    objects["tail"].localMatrix = utils.multiplyMatrices(clockHand1LocalMatrix, utils.MakeRotateZMatrix(step / 3 * EYE_ANGLE));
+    objects["tail"].localMatrix = utils.multiplyMatrices(objects["tail"].localMatrix, utils.MakeTranslateMatrix(0, -0.01, -0.01));
+    date = now;
 }
 
 
 function drawScene() {
-    // animate(); TODO
+    objects["body"].updateWorldMatrix();
+    animate();
     gl.clearColor(0.85, 0.85, 0.85, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // TODO DO THIS FOR EACH OBJECT
     for (let [k, v] of Object.entries(objects)) {
         let program = v.drawInfo.program;
         gl.useProgram(program);
