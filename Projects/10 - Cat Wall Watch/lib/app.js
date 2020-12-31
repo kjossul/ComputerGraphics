@@ -62,8 +62,8 @@ Node.prototype.updateWorldMatrix = function(matrix) {
 
 function main() {
     //define directional light
-    let dirLightAlpha = -utils.degToRad(60);
-    let dirLightBeta = -utils.degToRad(120);
+    let dirLightAlpha = -utils.degToRad(20);
+    let dirLightBeta = -utils.degToRad(90);
 
     directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
         Math.sin(dirLightAlpha),
@@ -136,6 +136,7 @@ function makeSceneGraph(programs) {
     objects["hand1"].setParent(objects["body"]);
     objects["hand2"].setParent(objects["body"]);
     objects["tail"].setParent(objects["body"]);
+    objects["body"].updateWorldMatrix();
 }
 
 function animate() {
@@ -148,9 +149,6 @@ function drawScene() {
     gl.clearColor(0.85, 0.85, 0.85, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    console.log(objects);
-    objects["body"].updateWorldMatrix();
-    console.log(objects);
     // TODO DO THIS FOR EACH OBJECT
     for (let [k, v] of Object.entries(objects)) {
         let program = v.drawInfo.program;
@@ -188,7 +186,7 @@ function drawScene() {
         let lightDirectionHandle = gl.getUniformLocation(program, 'lightDirection');
         let lightColorHandle = gl.getUniformLocation(program, 'lightColor');
 
-        let perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width / gl.canvas.height, 0.1, 100.0);
+        let perspectiveMatrix = utils.MakePerspective(2, gl.canvas.width / gl.canvas.height, 0.1, 100.0);
 
         let viewWorldMatrix = utils.multiplyMatrices(viewMatrix, v.worldMatrix);
         let projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, viewWorldMatrix);
@@ -209,9 +207,6 @@ function drawScene() {
             gl.uniform1i(textLocation, texture);
         }
         gl.drawElements(gl.TRIANGLES, v.drawInfo.mesh.indices.length, gl.UNSIGNED_SHORT, 0);
-        if (k === "eye2") {
-            break;
-        }
     }
    // END BLOCK
     window.requestAnimationFrame(drawScene);
