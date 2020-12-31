@@ -147,7 +147,7 @@ function animate() {
     let now = new Date();
     const alpha = 2 * Math.PI * now.getMilliseconds() / 1000.0;
     const beta = 360 * now.getMinutes() / 60;
-    const gamma = 360 * now.getHours() / 12;
+    const gamma = 360 * (now.getHours() % 12 + now.getMinutes() / 60) / 12;
     let step = Math.cos(alpha);
     objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
     objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
