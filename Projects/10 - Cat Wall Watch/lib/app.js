@@ -4,6 +4,10 @@ const EYE_ANGLE = 30.0;
 let date = null;
 let canw, canh;
 
+//define directional light
+let dirLightAlpha = -utils.degToRad(0);
+let dirLightBeta = -utils.degToRad(90);
+
 let directionalLight = null,
     directionalLightColor = null;
 
@@ -64,14 +68,6 @@ Node.prototype.updateWorldMatrix = function(matrix) {
 
 
 function main() {
-    //define directional light
-    let dirLightAlpha = -utils.degToRad(20);
-    let dirLightBeta = -utils.degToRad(90);
-
-    directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
-        Math.sin(dirLightAlpha),
-        Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
-    ];
     directionalLightColor = [1.0, 1.0, 1.0];
 
     utils.resizeCanvasToDisplaySize(gl.canvas);
@@ -158,6 +154,7 @@ function animate() {
     objects["tail"].localMatrix = utils.multiplyMatrices(objects["tail"].localMatrix, utils.MakeTranslateMatrix(0, -0.01, -0.01));
     date = now;
     objects["body"].updateWorldMatrix(utils.MakeRotateYMatrix(-document.getElementById("slider").value * 180));
+    document.getElementById("date").innerHTML = date;
 }
 
 function drawScene() {
@@ -165,7 +162,10 @@ function drawScene() {
     animate();
     gl.clearColor(0.85, 0.85, 0.85, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+    directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
+        Math.sin(dirLightAlpha),
+        Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
+    ];
     for (let [k, v] of Object.entries(objects)) {
         let program = v.drawInfo.program;
         gl.useProgram(program);
