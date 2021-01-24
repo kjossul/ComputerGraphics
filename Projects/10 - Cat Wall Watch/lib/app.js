@@ -12,6 +12,7 @@ let canvas = null,
 
 let objects = {};
 
+let pieces = ["body", "eye1", "eye2", "hand1", "hand2", "tail"];
 let catBody = null,
     clockHand1 = null,
     clockHand2 = null,
@@ -152,12 +153,12 @@ function animate() {
     objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
     objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
     objects["hand1"].localMatrix = utils.multiplyMatrices(clockHand1LocalMatrix, utils.MakeRotateZMatrix(beta));
-    objects["hand2"].localMatrix = utils.multiplyMatrices(clockHand1LocalMatrix, utils.MakeRotateZMatrix(gamma));
-    objects["tail"].localMatrix = utils.multiplyMatrices(clockHand1LocalMatrix, utils.MakeRotateZMatrix(step / 3 * EYE_ANGLE));
+    objects["hand2"].localMatrix = utils.multiplyMatrices(clockHand2LocalMatrix, utils.MakeRotateZMatrix(gamma));
+    objects["tail"].localMatrix = utils.multiplyMatrices(tailLocalMatrix, utils.MakeRotateZMatrix(step / 3 * EYE_ANGLE));
     objects["tail"].localMatrix = utils.multiplyMatrices(objects["tail"].localMatrix, utils.MakeTranslateMatrix(0, -0.01, -0.01));
     date = now;
+    objects["body"].updateWorldMatrix(utils.MakeRotateYMatrix(-document.getElementById("slider").value * 180));
 }
-
 
 function drawScene() {
     objects["body"].updateWorldMatrix();

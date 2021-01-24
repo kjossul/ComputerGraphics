@@ -74,23 +74,6 @@ let keyFunctionUp = function (e) {
     }
 };
 
-function doResize() {
-    // set canvas dimensions
-    let canvas = document.getElementById("c");
-    if ((window.innerWidth > 40) && (window.innerHeight > 320)) {
-        canvas.width = window.innerWidth - 16;
-        canvas.height = window.innerHeight - 260;
-        canw = canvas.clientWidth;
-        canh = canvas.clientHeight;
-
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-//		gl.viewport(0.0, 0.0, w, h);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-
-//		perspectiveMatrix = utils.MakePerspective(60, w/h, 0.1, 1000.0);
-
-    }
-}
 
 // event handler
 
