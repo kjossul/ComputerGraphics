@@ -1,5 +1,5 @@
 const BASE_DIR = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
-const EYE_ANGLE = 30.0;
+const TICK_ANGLE = 30.0;
 
 let date = null;
 let canw, canh;
@@ -16,7 +16,6 @@ let canvas = null,
 
 let objects = {};
 
-let pieces = ["body", "eye1", "eye2", "hand1", "hand2", "tail"];
 let catBody = null,
     clockHand1 = null,
     clockHand2 = null,
@@ -27,7 +26,6 @@ let texture = null;
 
 let viewMatrix = null;
 
-//example taken from webGLTutorial2
 var Node = function() {
     this.children = [];
     this.localMatrix = utils.identityMatrix();
@@ -52,7 +50,7 @@ Node.prototype.setParent = function(parent) {
 
 Node.prototype.updateWorldMatrix = function(matrix) {
     if (matrix) {
-        // a matrix was passed in so do the math
+        // a matrix was passed in
         this.worldMatrix = utils.multiplyMatrices(matrix, this.localMatrix);
     } else {
         // no matrix was passed in so just copy.
@@ -83,7 +81,6 @@ function main() {
 function makeSceneGraph(programs) {
     date = new Date();
     let p = (1000 - date.getMilliseconds()) / 1000;
-    console.log(p);
     // SCENE GRAPH
     objects["body"] = new Node();
     objects["body"].localMatrix = utils.MakeWorld(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
@@ -94,7 +91,7 @@ function makeSceneGraph(programs) {
         color: [1.0, 1.0, 1.0],
     };
     objects["eye1"] = new Node();
-    objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(EYE_ANGLE / 2 * p));
+    objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(TICK_ANGLE / 2 * p));
     objects["eye1"].drawInfo = {
         program: programs["eye"],
         mesh: catEye,
@@ -102,7 +99,7 @@ function makeSceneGraph(programs) {
         color: [1.0, 1.0, 1.0],
     };
     objects["eye2"] = new Node();
-    objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(EYE_ANGLE / 2 * p));
+    objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(TICK_ANGLE / 2 * p));
     objects["eye2"].drawInfo = {
         program: programs["eye"],
         mesh: catEye,
@@ -146,11 +143,11 @@ function animate() {
     const beta = 360 * now.getMinutes() / 60;
     const gamma = 360 * (now.getHours() % 12 + now.getMinutes() / 60) / 12;
     let step = Math.cos(alpha);
-    objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
-    objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(step * EYE_ANGLE));
+    objects["eye1"].localMatrix = utils.multiplyMatrices(eye1LocalMatrix, utils.MakeRotateYMatrix(step * TICK_ANGLE));
+    objects["eye2"].localMatrix = utils.multiplyMatrices(eye2LocalMatrix, utils.MakeRotateYMatrix(step * TICK_ANGLE));
     objects["hand1"].localMatrix = utils.multiplyMatrices(clockHand1LocalMatrix, utils.MakeRotateZMatrix(beta));
     objects["hand2"].localMatrix = utils.multiplyMatrices(clockHand2LocalMatrix, utils.MakeRotateZMatrix(gamma));
-    objects["tail"].localMatrix = utils.multiplyMatrices(tailLocalMatrix, utils.MakeRotateZMatrix(step / 3 * EYE_ANGLE));
+    objects["tail"].localMatrix = utils.multiplyMatrices(tailLocalMatrix, utils.MakeRotateZMatrix(step / 3 * TICK_ANGLE));
     objects["tail"].localMatrix = utils.multiplyMatrices(objects["tail"].localMatrix, utils.MakeTranslateMatrix(0, -0.01, -0.01));
     date = now;
     objects["body"].updateWorldMatrix(utils.MakeRotateYMatrix(-document.getElementById("slider").value * 180));
@@ -189,7 +186,7 @@ function drawScene() {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(v.drawInfo.mesh.indices), gl.STATIC_DRAW);
 
-        if (k === "body" || k === "eye1") {
+        if (k === "body" || k === "eye1" || k == "eye2") {
             let uvAttributeLocation = gl.getAttribLocation(program, "a_uv");
             let uvBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
@@ -206,7 +203,7 @@ function drawScene() {
 
         let viewWorldMatrix = utils.multiplyMatrices(viewMatrix, v.worldMatrix);
         let projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, viewWorldMatrix);
-
+        // object space light transformation
         let lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(v.worldMatrix));
         let directionalLightTransformed =
             utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
